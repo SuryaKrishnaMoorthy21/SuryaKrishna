@@ -8,6 +8,7 @@ import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from '@/lib/constants';
 import { useToast } from '@/components/Toast';
 import { Modal } from '@/components/Modal';
 import { EmptyState, LoadingState, ConfirmDialog } from '@/components/Feedback';
+import { logSupabaseError, getErrorToastMessage } from '@/lib/supabase-error';
 
 const CATEGORY_COLORS: Record<string, string> = {
   'Salary': 'bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400',
@@ -88,7 +89,8 @@ export function Expenses() {
       expense_date: expenseDate,
     });
     if (error) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Add expense');
+      show(getErrorToastMessage(info), 'error');
       setSaving(false);
       return;
     }

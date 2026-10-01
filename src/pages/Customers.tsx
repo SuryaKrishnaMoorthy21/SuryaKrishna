@@ -9,6 +9,7 @@ import { Modal } from '@/components/Modal';
 import { EmptyState, LoadingState } from '@/components/Feedback';
 import { PaymentBadge, StatusBadge } from '@/components/StatusBadge';
 import { Avatar } from '@/components/Avatar';
+import { logSupabaseError, getErrorToastMessage } from '@/lib/supabase-error';
 
 export function Customers() {
   const { t } = useLanguage();
@@ -45,7 +46,8 @@ export function Customers() {
       notes: newNotes.trim(),
     });
     if (error) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Add customer');
+      show(getErrorToastMessage(info), 'error');
       return;
     }
     show(t('customers.addedSuccess' as never));

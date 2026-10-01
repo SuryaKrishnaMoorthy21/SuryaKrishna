@@ -22,6 +22,7 @@ import { EmptyState, LoadingState, ConfirmDialog } from '@/components/Feedback';
 import { StatusBadge } from '@/components/StatusBadge';
 import { Avatar } from '@/components/Avatar';
 import { ImageCropper } from '@/components/ImageCropper';
+import { logSupabaseError, getErrorToastMessage } from '@/lib/supabase-error';
 
 export function StaffPage() {
   const { t } = useLanguage();
@@ -89,7 +90,8 @@ export function StaffPage() {
         photo_url: photoUrl,
       });
       if (error) {
-        show(error.message, 'error');
+        const info = logSupabaseError(error, 'Add staff');
+        show(getErrorToastMessage(info), 'error');
         return;
       }
       show(t('staff.addedSuccess'));
@@ -103,7 +105,8 @@ export function StaffPage() {
       setPhotoPreview(null);
       fetchStaff();
     } catch (error) {
-      show(error instanceof Error ? error.message : 'Unable to save staff member.', 'error');
+      const info = logSupabaseError(error, 'Add staff (upload)');
+      show(getErrorToastMessage(info), 'error');
     } finally {
       setSaving(false);
     }

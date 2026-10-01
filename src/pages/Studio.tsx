@@ -20,6 +20,7 @@ import { useToast } from '@/components/Toast';
 import { Modal } from '@/components/Modal';
 import { EmptyState, LoadingState } from '@/components/Feedback';
 import { PaymentBadge } from '@/components/StatusBadge';
+import { logSupabaseError, getErrorToastMessage } from '@/lib/supabase-error';
 
 type FilterKey = 'today' | 'week' | 'month';
 
@@ -275,7 +276,8 @@ function NewBillForm({
       .select()
       .single();
     if (error) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Add customer (studio bill)');
+      show(getErrorToastMessage(info), 'error');
       return;
     }
     const newCust = data as Customer;
@@ -324,7 +326,8 @@ function NewBillForm({
       .single();
 
     if (billError || !billData) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(billError, 'Create bill');
+      show(getErrorToastMessage(info), 'error');
       setSaving(false);
       return;
     }

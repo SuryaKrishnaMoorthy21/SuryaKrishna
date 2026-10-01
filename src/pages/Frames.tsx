@@ -9,6 +9,7 @@ import { useToast } from '@/components/Toast';
 import { Modal } from '@/components/Modal';
 import { EmptyState, LoadingState, ConfirmDialog } from '@/components/Feedback';
 import { StatusBadge, PaymentBadge } from '@/components/StatusBadge';
+import { logSupabaseError, getErrorToastMessage } from '@/lib/supabase-error';
 
 type TabKey = 'all' | 'New' | 'Processing' | 'Ready' | 'Delivered' | 'Cancelled';
 
@@ -212,7 +213,8 @@ function NewOrderForm({ onClose, onSaved }: { onClose: () => void; onSaved: () =
       .select()
       .single();
     if (error) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Add customer (frame order)');
+      show(getErrorToastMessage(info), 'error');
       return;
     }
     const newCust = data as Customer;
@@ -280,7 +282,8 @@ function NewOrderForm({ onClose, onSaved }: { onClose: () => void; onSaved: () =
       .single();
 
     if (error || !orderData) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Create frame order');
+      show(getErrorToastMessage(info), 'error');
       setSaving(false);
       return;
     }

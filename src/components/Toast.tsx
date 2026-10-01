@@ -26,7 +26,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const show = useCallback((message: string, type: ToastType = 'success') => {
     const id = `${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { id, type, message }]);
+    setToasts((prev) => {
+      const isDuplicate = prev.some(
+        (t) => t.type === type && t.message === message
+      );
+      if (isDuplicate) return prev;
+      return [...prev, { id, type, message }];
+    });
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 3500);

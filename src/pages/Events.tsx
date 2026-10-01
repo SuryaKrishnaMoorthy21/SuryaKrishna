@@ -22,6 +22,7 @@ import { useToast } from '@/components/Toast';
 import { Modal } from '@/components/Modal';
 import { EmptyState, LoadingState, ConfirmDialog } from '@/components/Feedback';
 import { StatusBadge } from '@/components/StatusBadge';
+import { logSupabaseError, getErrorToastMessage } from '@/lib/supabase-error';
 
 export function Events() {
   const { t } = useLanguage();
@@ -439,7 +440,8 @@ function NewEventForm({ onClose, onSaved }: { onClose: () => void; onSaved: () =
       .select()
       .single();
     if (error) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Add customer (event)');
+      show(getErrorToastMessage(info), 'error');
       return;
     }
     const newCust = data as Customer;
@@ -506,7 +508,8 @@ function NewEventForm({ onClose, onSaved }: { onClose: () => void; onSaved: () =
       .single();
 
     if (error || !eventData) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Create event');
+      show(getErrorToastMessage(info), 'error');
       setSaving(false);
       return;
     }
@@ -782,7 +785,8 @@ function EventDetail({ event, onBack }: { event: EventRecord; onBack: () => void
       role: assignRole,
     });
     if (error) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Assign staff to event');
+      show(getErrorToastMessage(info), 'error');
       return;
     }
     show('Staff assigned successfully');
@@ -815,7 +819,8 @@ function EventDetail({ event, onBack }: { event: EventRecord; onBack: () => void
       note: 'Event payment',
     });
     if (error) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Record event payment');
+      show(getErrorToastMessage(info), 'error');
       return;
     }
     await supabase.from('events').update({ balance: balance - amount }).eq('id', event.id);

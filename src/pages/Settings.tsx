@@ -9,6 +9,7 @@ import { useLanguage } from '@/lib/i18n';
 import { LoadingState, ConfirmDialog } from '@/components/Feedback';
 import { StudioLogo } from '@/components/Avatar';
 import { EVENT_TYPES } from '@/lib/constants';
+import { logSupabaseError, getErrorToastMessage } from '@/lib/supabase-error';
 
 export function SettingsPage() {
   const { show } = useToast();
@@ -99,7 +100,8 @@ export function SettingsPage() {
         })
         .eq('id', settings.id);
       if (error) {
-        show(error.message, 'error');
+        const info = logSupabaseError(error, 'Save settings');
+        show(getErrorToastMessage(info), 'error');
         return;
       }
       show(t('settings.savedSuccess'));
@@ -109,7 +111,8 @@ export function SettingsPage() {
       window.dispatchEvent(new CustomEvent('settings-updated'));
       await fetchAll();
     } catch (error) {
-      show(error instanceof Error ? error.message : 'Unable to save settings.', 'error');
+      const info = logSupabaseError(error, 'Save settings (upload)');
+      show(getErrorToastMessage(info), 'error');
     } finally {
       setSaving(false);
     }
@@ -128,7 +131,8 @@ export function SettingsPage() {
       sort_order: maxSort + 1,
     });
     if (error) {
-      show('Something went wrong. Please try again.', 'error');
+      const info = logSupabaseError(error, 'Add service');
+      show(getErrorToastMessage(info), 'error');
       return;
     }
     show(t('settings.serviceAdded'));
